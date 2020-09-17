@@ -8,7 +8,7 @@ public enum states
 {setup, start, postGoal, end}
 
 public enum powerUps
-{ smallBall, bigBall, freezeBall, freezeOp, speedSelf, jumpUpSelf, jumpDownOpp, pitchInvader, slowOp }
+{ none, smallBall, bigBall, freezeBall, freezeOp, speedSelf, jumpUpSelf, jumpDownOpp, pitchInvader, slowOp }
 
 public class GameManager : MonoBehaviour
 {
@@ -38,15 +38,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject ball;
 
-    private GameObject particle1Prefab;
-    private GameObject particle2Prefab;
-
-    private GameObject particleObject1;
-    private GameObject particleObject2;
-    
-    public ParticleSystem P1Goal;
-    public ParticleSystem P2Goal;
-
     public bool P1Scored;
     public bool P2Scored;
 
@@ -75,6 +66,20 @@ public class GameManager : MonoBehaviour
     [Header("PowerUps")]
     public powerUps ability;
     #endregion
+
+    #region VFX
+    private GameObject particle1Prefab;
+    private GameObject particle2Prefab;
+
+    private GameObject particleObject1;
+    private GameObject particleObject2;
+
+    public ParticleSystem P1Goal;
+    public ParticleSystem P2Goal;
+
+    public Explosion effect;
+    #endregion
+
 
     // Start is called before the first frame update
     void Start()
@@ -144,6 +149,12 @@ public class GameManager : MonoBehaviour
             yield return new WaitUntil(() => P1Scored || P2Scored);
             if (P1Scored || P2Scored)
             {
+                Player1.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+                Player2.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+
+                player1Control.canMove = false;
+                player2Control.canMove = false;
+
                 if (homeScore < 5 || awayScore < 5)
                 {
                     gameState = states.postGoal;
@@ -152,7 +163,7 @@ public class GameManager : MonoBehaviour
                     Instantiate(particle2Prefab, ballObject.transform.position - new Vector3(1, 0, 0), Quaternion.identity);
 
                     particleObject1 = GameObject.FindGameObjectWithTag("PS");
-                    particleObject2 = GameObject.FindGameObjectWithTag("PS2");
+                    particleObject2 = GameObject.FindGameObjectWithTag("PS2");            
 
                     P1Goal = particleObject1.GetComponent<ParticleSystem>();
                     P2Goal = particleObject2.GetComponent<ParticleSystem>();
@@ -211,24 +222,32 @@ public class GameManager : MonoBehaviour
                 P2Control.SetActive(false);
             }
         }
+        if (ability != powerUps.none)
+        {
+            //function to start a timer for ability
+        }
     }
     public void Player1Scored()
     {
-        player2Control.canMove = false;
         P1Scored = false;
 
         Destroy(ballObject);
         P1Goal.Play();
+        effect = particleObject1.GetComponent<Explosion>();
+        effect.Boom();
+        
         homeScore = homeScore + 1;
         UpdateScore();
     }
     public void Player2Scored()
     {
-        player1Control.canMove = false;
         P2Scored = false;
 
         Destroy(ballObject);
         P2Goal.Play();
+        effect = particleObject2.GetComponent<Explosion>();
+        effect.Boom();
+
         awayScore = awayScore + 1;
         UpdateScore();
     }

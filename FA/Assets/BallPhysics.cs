@@ -18,6 +18,9 @@ public class BallPhysics : MonoBehaviour
     public int yForceMax;
 
     public GameObject shadow;
+
+    public bool player1Kick;
+    public bool player2Kick;
     #endregion
 
     private GameManager gm;
@@ -46,20 +49,46 @@ public class BallPhysics : MonoBehaviour
             Vector3 direction = (collision.transform.position - transform.position).normalized;
             Debug.Log(direction);
             myRigidbody.AddForce(Vector3.Scale(-direction, new Vector3 (2,2,0))* collision.gameObject.GetComponent<PlayerController>().kickForce , ForceMode2D.Impulse);
+
+            if (collision.gameObject.GetComponent<PlayerController>().player1)
+            {
+                player1Kick = true;
+                player2Kick = false;
+            }
+
+            else if (collision.gameObject.GetComponent<PlayerController>().player2)
+            {
+                player1Kick = false;
+                player2Kick = true;
+            }
         }
-        else if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "Player")
         {
             Debug.Log("head");
             Vector3 direction = (collision.transform.position - transform.position).normalized;
             myRigidbody.AddForce(-direction * collision.gameObject.GetComponent<PlayerController>().headForce, ForceMode2D.Impulse);
+
+            if (collision.gameObject.GetComponent<PlayerController>().player1)
+            {
+                player1Kick = true;
+                player2Kick = false;
+            }
+
+            else if (collision.gameObject.GetComponent<PlayerController>().player2)
+            {
+                player1Kick = false;
+                player2Kick = true;
+            }
+
         }
+
     }
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         float step = 1f * Time.deltaTime;
-        if(collision.collider.gameObject.name == "Crossbar")
+        if (collision.GetComponent<Collider>().gameObject.name == "Crossbar")
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(0f,transform.position.y,transform.position.z), step);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(0f, transform.position.y, transform.position.z), step);
         }
     }
 }

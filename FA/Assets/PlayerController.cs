@@ -191,15 +191,4 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    /*
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.gameObject.tag == "Boot" && collision.collider.gameObject.GetComponent<Boot>().shoot == true)
-        {
-            Debug.Log("kick player");
-            Vector3 direction = (collision.gameObject.GetComponentInParent<PlayerController>().transform.position - gameObject.GetComponentInParent<PlayerController>(myGameObject).transform.position).normalized;
-            myRigidbody.AddForce(-direction  * collision.gameObject.GetComponent<PlayerController>().kickForce * 200, ForceMode2D.Impulse);
-        }
-    }
-    */
 }
